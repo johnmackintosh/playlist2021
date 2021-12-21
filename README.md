@@ -1,7 +1,7 @@
 # playlist2021
 recreating 2021 playlist with reactable and reactablefmtr
 
-[view it](https://rawcdn.githack.com/johnmackintosh/playlist2021/main/playlist.html)
+[view it](https://cdn.statically.io/gh/johnmackintosh/playlist2021/main/playlist.html)
 
 
 preview:
