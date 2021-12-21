@@ -1,0 +1,84 @@
+---
+title: "2021-playlist"
+author: "JM"
+date: "10/12/2021"
+output: html_document
+---
+
+
+## My 2021 youtube playlist
+
+Full of certified bangers, or your money back
+
+
+```{r setup, include=FALSE, warning=FALSE, message = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(data.table)
+library(dplyr)
+library(here)
+library(reactable)
+library(reactablefmtr)
+library(htmltools)
+library(htmlwidgets)
+library(webshot2)
+```
+
+
+```{r, echo = FALSE, warning=FALSE, message = FALSE}
+data <- fread("2021-playlist.txt")
+#data[, Time := format(as.POSIXct(Time, format = "%H:%M"),"%H:%M")]# set to time format
+
+links <- fread("links.txt")
+
+
+joined <- data %>%
+   left_join(links, on = "ID")
+
+images <- dir(here("images"), full.names = TRUE)
+
+joined$Img <- images
+
+
+playlist <- reactable(joined,
+theme = slate(font_family = "Arial",
+              font_size = 18,
+              header_font_size = 20,
+              header_font_color = "darkorange",
+              cell_padding = 8),
+columns = list(ID = colDef(name = "ID", show = FALSE),
+               Song = colDef(name = "Track"),
+               Artist = colDef(name = "Artist"),
+               Album = colDef(name = "Album"),
+               Year = colDef(name = "Year"),
+               Time = colDef(name = "Duration"),#,
+              # format = colFormat(time = TRUE, locales = "en-GB")
+              Img = colDef(name = "Cover", show = FALSE,
+              cell = function(value) {
+              img_src <- knitr::image_uri(sprintf("%s", value))
+              image <- img(src = img_src, height = "45px", alt = "")
+              tagList(div(style = list(display = "inline-block",
+                                       width = "45px"), image))}),
+              Link = colDef(name = "Link",
+                            #minWidth = 300,
+  cell = function(value, index) {
+      url <- value
+    htmltools::tags$a(href = url, target = "_blank", as.character(value))
+    }) # end of Link definition
+  
+  ), # end of column list
+
+pagination = FALSE,
+filterable = TRUE,
+striped = TRUE,
+bordered = TRUE,
+defaultColDef = colDef(footerStyle = list(fontWeight = "bold")))
+
+playlist
+
+html_file <- "playlist.html"
+img_file <- "img.png"
+webshot(url = html_file, file = img_file,delay = 0.1, vwidth = 1245)
+saveWidget(widget = playlist, file = html_file, selfcontained = TRUE)
+
+```
+
